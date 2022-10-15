@@ -2,7 +2,7 @@ from collections import namedtuple
 import pygame as pg
 from enum import Enum
 import random as rand
-
+import numpy as np
 pg.init()
 
 # setting the font_face and size
@@ -40,6 +40,10 @@ class Nokia_Game:
         pg.display.set_caption('Nokia Snake Game')
         self.clock = pg.time.Clock()
         
+        # reset_game method is called
+        self.reset_game()
+    
+    def reset_game(self):
         # initial direction is set
         self.direction = Direction.RIGHT
         
@@ -53,6 +57,8 @@ class Nokia_Game:
         self.worm = None
         # insert worm method is called to set the x and y coordinates 
         self.insert_worm()
+        # keeps track of the game iteration
+        self.game_iteration = 0
         
     def insert_worm(self):
         # worm's x and y coordiantes are set and assigns random values within the frame
@@ -64,50 +70,59 @@ class Nokia_Game:
             # the insert_worm method is called again to insert the worm ata different position
             self.insert_worm()
         
-    def play_game(self):
+    def play_game(self, action):
+        # game iteration is incremented
+        self.game_iteration += 1
         # gets user input
         for event in pg.event.get():
             # checks if the event is quit, then pg.quit() and sys.exit() methods are called
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
-            # checks if any key is pressed down
-            if event.type == pg.KEYDOWN:
-                # checks if the key pressed is up arrow
-                if event.key == pg.K_UP:
-                    # value 3 is set to the variable direction
-                    self.direction = Direction.UP
-                # checks if the key pressed is down arrow
-                elif event.key == pg.K_DOWN:
-                    # value 4 is set to the variable direction
-                    self.direction = Direction.DOWN
-                # checks if the key pressed is left arrow
-                elif event.key == pg.K_LEFT:
-                    # value 1 is set to the variable direction
-                    self.direction = Direction.LEFT
-                # checks if the key pressed is right arrow
-                elif event.key == pg.K_RIGHT:
-                    # value 2 is set to the variable direction
-                    self.direction = Direction.RIGHT
+            # # checks if any key is pressed down
+            # if event.type == pg.KEYDOWN:
+            #     # checks if the key pressed is up arrow
+            #     if event.key == pg.K_UP:
+            #         # value 3 is set to the variable direction
+            #         self.direction = Direction.UP
+            #     # checks if the key pressed is down arrow
+            #     elif event.key == pg.K_DOWN:
+            #         # value 4 is set to the variable direction
+            #         self.direction = Direction.DOWN
+            #     # checks if the key pressed is left arrow
+            #     elif event.key == pg.K_LEFT:
+            #         # value 1 is set to the variable direction
+            #         self.direction = Direction.LEFT
+            #     # checks if the key pressed is right arrow
+            #     elif event.key == pg.K_RIGHT:
+            #         # value 2 is set to the variable direction
+            #         self.direction = Direction.RIGHT
                 
-        
-        # depending on the change in direction updated above, the direction of the snake is changed
+        # depending on the value in action, the direction of the snake is changed
         # by calling by the move_direction method
         # This updates the head
-        self.move_direction(self.direction) 
+        self.move_direction(action) 
         # the updated head is added to the snake
         self.snake.insert(0, self.snake_head)
+
+        # to check reward, the value is initialized to 0
+        reward = 0
         # game_over variable is set to False
         game_over = False
         # check if the game is over by calling the collision method
-        if self.collision():
+        # or if there are not a lot of changes after many iterations
+        if self.collision() or self.game_iteration > 100*len(self.snake):
             # sets the game_over variable to True
             game_over = True
+            # if the game is over, the reward is set to -100
+            reward = -100
             # returns the game_over and score variable to the main method
-            return game_over, self.score
+            return reward, game_over, self.score
             
         # if the head of the snake touches the worm
         if self.snake_head == self.worm:
+            # if snake eats the food, reward is set to 100
+            reward = 100
             # score is incremented by 1
             self.score += 1
             # the worm is inserted elsewhere by calling the insert_worm method
@@ -120,15 +135,17 @@ class Nokia_Game:
         # updating the clock speed 
         self.clock.tick(speed)
         # returning the values in game_over and score variable
-        return game_over, self.score
+        return reward, game_over, self.score
     
     # checks if any collision has happened
-    def collision(self):
+    def collision(self, point = None):
+        if point is None:
+            point = self.snake_head
         # if the head of the snake hits any of the boundaries, it will return a boolean value 'True'
-        if (self.snake_head.x > self.width - snake_block) or (self.snake_head.x < 0) or (self.snake_head.y > self.height - snake_block) or (self.snake_head.y < 0):
+        if (self.point.x > self.width - snake_block) or (self.point.x < 0) or (self.point.y > self.height - snake_block) or (self.point.y < 0):
             return True
         # if the head of the snake hit any part of itself, it will return a boolean value 'True'
-        if self.snake_head in self.snake[1:]:
+        if self.point in self.snake[1:]:
             return True
         # if it does not satisfy any of the above conditions, it will return a boolean value 'False'
         return False
@@ -156,19 +173,44 @@ class Nokia_Game:
         self.display_message("Score: " + str(self.score), black, [0, 0])
         pg.display.flip()
         
-    # this method is used to move the direction of the snake
-    def move_direction(self, direction):
+    # this method is used to determine the direction based on the action
+    def move_direction(self, action):
+        # Index 0: Straight
+        # Index 1: Right
+        # Index 2: Left
+        clockwise_directions = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
+        index = clockwise_directions.index(self.direction)
+        # if action is equal to [1,0,0], no change in direction
+        if np.array_equal(action, [1,0,0]):
+            new_direction = clockwise_directions[index]
+        # if action is equal to [0,1,0]
+        # right -> down -> left -> up
+        elif np.array_equal(action, [0,1,0]):
+            # it moves to the next value in the direction_arr
+            new_index = (index + 1) % 4
+            new_direction = clockwise_directions[new_index]
+
+        # if action is equal to [0,0,1]
+        # right -> up -> left -> down
+        else:
+            # it moves to the previous value in the direction_arr
+            new_index = (index - 1) % 4
+            new_direction = clockwise_directions[new_index]
+        
+        # direction is changed to updated value
+        self.direction = new_direction
+
         # the x and y axis values are set
         x_axis = self.snake_head.x
         y_axis = self.snake_head.y
         # depending on the direction of the snake, x and y axis values are changed
-        if direction == Direction.DOWN:
+        if self.direction == Direction.DOWN:
             y_axis += snake_block
-        elif direction == Direction.UP:
+        elif self.direction == Direction.UP:
             y_axis -= snake_block
-        elif direction == Direction.RIGHT:
+        elif self.direction == Direction.RIGHT:
             x_axis += snake_block
-        elif direction == Direction.LEFT:
+        elif self.direction == Direction.LEFT:
             x_axis -= snake_block
         # the head value is updated
         self.snake_head = Point(x_axis, y_axis)
