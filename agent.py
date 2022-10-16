@@ -4,14 +4,13 @@ import torch
 from collections import deque
 # importing the snake_game module
 from snake_game import Nokia_Game, Direction, Point
+# importing from thr model file
+from model import Linear_QNet, QTrainer
 import matplotlib.pyplot as plt
 from IPython import display
 import random
 import numpy as np
 
-MAX_MEM = 100_000
-SIZE_BATCH = 1000
-LEARNING_RATE = 0.001
 plt.ion()
 
 # class Agent
@@ -22,10 +21,14 @@ class Agent:
         self.num_games = 0
         # randomness parameter
         self.randomness = 0 
-        # discount rate
-        self.discount_rate = 0.9 
         # if stack exceeds memory, it removes elements from the left
-        self.memory = deque(maxlen = MAX_MEM)
+        self.memory = deque(maxlen = 100_000)
+        # the model file's objects are created
+        # Linear_QNet class id called by passing input, hidden and output sizes
+        # Input layer: Size of the state
+        # Output layer: Size of the action
+        self.model = Linear_QNet(11, 256, 3)
+        self.trainer = QTrainer(self.model, learning_rate = 0.001, discount_rate = 0.9)
 
     # method remember 
     # inputs: state, new_state, action , reward, game_over
@@ -134,19 +137,35 @@ class Agent:
 
     def long_memory_train(self):
         # if the memory size is greater than the batch size
-        if len(self.memory) > SIZE_BATCH:
+        if len(self.memory) > 1000:
             # random samples of SIZE_BATCH is stored in random_smaller_sample
-            random_smaller_sample = random.sample(self.memory, SIZE_BATCH)
+            random_smaller_sample = random.sample(self.memory, 1000)
         else:
             # else, the entire memory is stored in random_smaller_sample
             random_smaller_sample = self.memory
         # trainer is called to do the optimization
         for current_state, action, reward, new_state, game_over in random_smaller_sample:
-            pass
+            self.trainer.train_step(current_state, action, reward, new_state, game_over)
 
     def short_memory_train(self, current_state, action, reward, new_state, game_over):
-        pass
+        # trainer is called to do the optimization
+        self.trainer.train_step(current_state, action, reward, new_state, game_over)
 
+# this method is used to plot the scores in a graph
+def plot(scores, mean_scores):
+    display.clear_output(wait=True)
+    display.display(plt.gcf())
+    plt.clf()
+    plt.title('Training...')
+    plt.xlabel('Number of Games')
+    plt.ylabel('Score')
+    plt.plot(scores)
+    plt.plot(mean_scores)
+    plt.ylim(ymin=0)
+    plt.text(len(scores)-1, scores[-1], str(scores[-1]))
+    plt.text(len(mean_scores)-1, mean_scores[-1], str(mean_scores[-1]))
+    plt.show(block=False)
+    plt.pause(.1)
     
 def train_model():
     # keeps track of scores to plot
@@ -189,6 +208,8 @@ def train_model():
             # updates best_score if there is a new high score
             if score > best_score:
                 best_score = score
+                # if there is a new high score, this model is saved
+                agent.model.save_model()
 
             # printing all the paramters
             print('Game', agent.num_games, 'Score', score, 'Best Score:', best_score)
@@ -201,6 +222,8 @@ def train_model():
             mean_score = score_sum / agent.num_games
             # mean score is appended to the list
             mean_score_graph.append(mean_score)
+            # these values are then plotted
+            plot(score_graph, mean_score_graph)
 
 if __name__ == '__main__':
     train_model()
