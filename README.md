@@ -11,3 +11,6 @@ This application makes use of Python's Pygame and Pytorch libraries to implement
 3. pip install pygame
 4. pip install torch torchvision
 5. pip install matplotlib ipython
+
+## Working of the Application
+Uploading Reinforcement Learning - Snake Game.mov…
