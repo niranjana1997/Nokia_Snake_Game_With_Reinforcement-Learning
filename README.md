@@ -22,4 +22,10 @@ The following commands are used to install pygame, torch and matplotlib:
     2. With each move and game, it tries to learn more.
     3. In this project, after about 80 game iterations (around 10 minutes), it knows how to play better through improvement.
 ## Output of the Application
-https://user-images.githubusercontent.com/89472841/196057438-7d37a453-9651-4efc-8e1d-5e385c1bb94f.mov
+
+https://user-images.githubusercontent.com/89472841/196058472-82e5d625-cacc-4bdd-9ecd-016948910de1.mov
+
+Output at Iteration 100:
+
+<img width="1244" alt="Screen Shot 2022-10-16 at 5 09 34 PM" src="https://user-images.githubusercontent.com/89472841/196058493-626f0cd8-4734-41f2-b2ac-f1e7f6d1577b.png">
+
