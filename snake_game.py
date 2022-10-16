@@ -27,6 +27,7 @@ speed = 15
 
 Point = namedtuple('Point', 'x, y')
 
+
 # created a class Nokia_Game
 class Nokia_Game:
     # initializer has parameters width (default: 600) and height (default: 400)
@@ -36,13 +37,14 @@ class Nokia_Game:
         self.height = height
         # displays the window using the pygame library with width and height
         self.window = pg.display.set_mode((self.width, self.height))
+        self.clock = pg.time.Clock()
         # title of the window is set
         pg.display.set_caption('Nokia Snake Game')
-        self.clock = pg.time.Clock()
         
         # reset_game method is called
         self.reset_game()
-    
+
+
     def reset_game(self):
         # initial direction is set
         self.direction = Direction.RIGHT
@@ -59,7 +61,8 @@ class Nokia_Game:
         self.insert_worm()
         # keeps track of the game iteration
         self.game_iteration = 0
-        
+
+
     def insert_worm(self):
         # worm's x and y coordiantes are set and assigns random values within the frame
         worm_x = rand.randint(0, (self.width - snake_block) // snake_block) * snake_block 
@@ -69,7 +72,8 @@ class Nokia_Game:
         if self.worm in self.snake:
             # the insert_worm method is called again to insert the worm ata different position
             self.insert_worm()
-        
+
+
     def play_game(self, action):
         # game iteration is incremented
         self.game_iteration += 1
@@ -136,19 +140,21 @@ class Nokia_Game:
         self.clock.tick(speed)
         # returning the values in game_over and score variable
         return reward, game_over, self.score
-    
+
+
     # checks if any collision has happened
     def collision(self, point = None):
         if point is None:
             point = self.snake_head
         # if the head of the snake hits any of the boundaries, it will return a boolean value 'True'
-        if (self.point.x > self.width - snake_block) or (self.point.x < 0) or (self.point.y > self.height - snake_block) or (self.point.y < 0):
+        if (point.x > self.width - snake_block) or (point.x < 0) or (point.y > self.height - snake_block) or (point.y < 0):
             return True
         # if the head of the snake hit any part of itself, it will return a boolean value 'True'
-        if self.point in self.snake[1:]:
+        if point in self.snake[1:]:
             return True
         # if it does not satisfy any of the above conditions, it will return a boolean value 'False'
         return False
+
 
     # function to display message in the frame
     def display_message(self, message, font_color, coordinates):
@@ -172,8 +178,9 @@ class Nokia_Game:
         # score is updated by calling the method display_message
         self.display_message("Score: " + str(self.score), black, [0, 0])
         pg.display.flip()
-        
-    # this method is used to determine the direction based on the action
+
+
+   # this method is used to determine the direction based on the action
     def move_direction(self, action):
         # Index 0: Straight
         # Index 1: Right
@@ -216,17 +223,17 @@ class Nokia_Game:
         self.snake_head = Point(x_axis, y_axis)
             
 
-if __name__ == '__main__':
-    # nokia_game is created with class Nokia_Game
-    nokia_game = Nokia_Game()
-    # this loop will run till the game_over variable is set to True
-    while True:
-        # values returned from the play_game method is stored in game_over and score
-        game_over, score = nokia_game.play_game()
-        # if the game is over
-        if game_over:
-            break
-    # score is printed
-    print('Score', score)  
-    # the game window is closed
-    pg.quit()
+# if __name__ == '__main__':
+#     # nokia_game is created with class Nokia_Game
+#     nokia_game = Nokia_Game()
+#     # this loop will run till the game_over variable is set to True
+#     while True:
+#         # values returned from the play_game method is stored in game_over and score
+#         game_over, score = nokia_game.play_game()
+#         # if the game is over
+#         if game_over:
+#             break
+#     # score is printed
+#     print('Score', score)  
+#     # the game window is closed
+#     pg.quit()
