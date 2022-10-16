@@ -3,7 +3,7 @@ Snake – First published by Nokia, for monochrome phones. It was programmed in 
 
 ![image](https://user-images.githubusercontent.com/89472841/196009178-180e840e-9fd8-40ae-bb36-620bbfc0db94.png)
 
-This project is about implementing the reinforcement learning algorithm Deep Q-Learning on the Nokia's Snake Game. It makes use of the Python's Pygame and Pytorch libraries. 
+This project is about implementing the reinforcement learning algorithm Deep Q-Learning on the Nokia's Snake Game to predict the actions. It makes use of the Python's Pygame and Pytorch libraries. 
 
 ## Installation
 ### Virtual Environment
@@ -23,4 +23,3 @@ The following commands are used to install pygame, torch and matplotlib:
     3. In this project, after about 80 game iterations (around 10 minutes), it knows how to play better through improvement.
 ## Output of the Application
 https://user-images.githubusercontent.com/89472841/196057438-7d37a453-9651-4efc-8e1d-5e385c1bb94f.mov
-
