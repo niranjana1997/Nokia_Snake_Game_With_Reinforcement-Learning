@@ -18,9 +18,9 @@ The following commands are used to install pygame, torch and matplotlib:
 ## Working of the Application:
 1. Rule of the Game: Snake should not hit the boundaries and itself.
 2. Process:
-  1. Initially, snake knows nothing about the game. It is only aware of the environment and tries to make more or less random moves.
-  2. With each move and game, it tries to learn more.
-  3. In this project, after about 80 game iterations (around 10 minutes), it knows how to play better through improvement.
+    1. Initially, snake knows nothing about the game. It is only aware of the environment and tries to make more or less random moves.
+    2. With each move and game, it tries to learn more.
+    3. In this project, after about 80 game iterations (around 10 minutes), it knows how to play better through improvement.
 ## Output of the Application
 https://user-images.githubusercontent.com/89472841/196057438-7d37a453-9651-4efc-8e1d-5e385c1bb94f.mov
 
