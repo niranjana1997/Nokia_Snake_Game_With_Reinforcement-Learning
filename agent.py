@@ -5,19 +5,18 @@ from collections import deque
 # importing the snake_game module
 from snake_game import Nokia_Game, Direction, Point
 import matplotlib.pyplot as plt
+from IPython import display
+import random
 import numpy as np
 
 MAX_MEM = 100_000
 SIZE_BATCH = 1000
 LEARNING_RATE = 0.001
-
-MAX_MEM = 100_000
-SIZE_BATCH = 1000
-LEARNING_RATE = 0.001
+plt.ion()
 
 # class Agent
 class Agent:
-     # initializer
+    # initializer
     def __init__(self):
         # number of games parameter
         self.num_games = 0
@@ -29,13 +28,10 @@ class Agent:
         self.memory = deque(maxlen = MAX_MEM)
 
     # method remember 
-    # inputs: reward, state, action, new_state, game_over
-    def remember(self, state, reward, action, new_state, game_over):
-        pass
-
-    # method remember 
     # inputs: state, new_state, action , reward, game_over
     def remember(self, state, new_state, action, reward, game_over):
+        # these variables are added to the memory stack as tuples
+        # if the stack if full, it will pop the element to the left
         self.memory.append((state, action, reward, new_state, game_over))
 
     # method to get the state
@@ -104,18 +100,54 @@ class Agent:
         # this array is converted to numpy array of type int and returned
         return np.array(state, dtype=int)
 
-
     # method get_action
     # get action based on the state
     def get_action(self, state):
-        pass
+        # in the beginning, few random moves are needed
+        # This is called a tradeoff between exploration and exploitation
+        # randomness parameter is set
+        # this depends on the number of games
+        # more the games, smaller will be the randomness variable's value
+        self.randomness = 80 - self.num_games
+        # one of the values has to be true
+        move_array = [0,0,0]
+        # if the random value is less than the randomness variable
+        # smaller the value of randomness variable, this if condition's frequency will be less
+        if random.randint(0, 200) < self.randomness:
+            # it chooses a random move (either straight, left or right)
+            index = random.randint(0, 2)
+            # move_array is updated to that direction
+            move_array[index] = 1
+        else:
+            # here, move based on the model is done
+            # this state is converted to tensor of float type
+            first_state = torch.tensor(state, dtype=torch.float)
+            # it wants to predict action based on the first_state
+            # prediciton has raw float values
+            prediction = self.model(first_state)
+            # this gets the maximum value from the tensor
+            idx = torch.argmax(prediction).item()
+            # sets the maximum index value to 1, thereby changing the direction
+            move_array[idx] = 1
+        # new move direction is returned
+        return move_array
 
     def long_memory_train(self):
+        # if the memory size is greater than the batch size
+        if len(self.memory) > SIZE_BATCH:
+            # random samples of SIZE_BATCH is stored in random_smaller_sample
+            random_smaller_sample = random.sample(self.memory, SIZE_BATCH)
+        else:
+            # else, the entire memory is stored in random_smaller_sample
+            random_smaller_sample = self.memory
+        # trainer is called to do the optimization
+        for current_state, action, reward, new_state, game_over in random_smaller_sample:
+            pass
+
+    def short_memory_train(self, current_state, action, reward, new_state, game_over):
         pass
 
-    def short_memory_train(self):
-        pass
-
+    
 def train_model():
     # keeps track of scores to plot
     score_graph = []
@@ -169,14 +201,6 @@ def train_model():
             mean_score = score_sum / agent.num_games
             # mean score is appended to the list
             mean_score_graph.append(mean_score)
-
-    # method remember 
-    # inputs: state, new_state, action , reward, game_over
-    def remember(self, state, new_state, action, reward, game_over):
-        # these variables are passed to the memory stack
-        # if the stack if full, it will pop the element to the left
-        self.memory.append((state, action, reward, new_state, game_over))
-
 
 if __name__ == '__main__':
     train_model()
