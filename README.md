@@ -8,8 +8,8 @@ This project is about implementing the reinforcement learning algorithm Deep Q-L
 ## Installation
 ### Virtual Environment
 A virtual environemnt is created and activated by running the following commands: 
-1. conda create -n pygame_env python=3.7
-2. conda activate pygame_env
+> 1. conda create -n pygame_env python=3.7
+> 2. conda activate pygame_env
 ### Other Installations
 The following commands are used to install pygame, torch and matplotlib:
 1. pip install pygame
