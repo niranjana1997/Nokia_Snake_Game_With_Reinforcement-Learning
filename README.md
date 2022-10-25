@@ -12,9 +12,9 @@ A virtual environemnt is created and activated by running the following commands
 > 2. conda activate pygame_env
 ### Other Installations
 The following commands are used to install pygame, torch and matplotlib:
-1. pip install pygame
-2. pip install torch torchvision
-3. pip install matplotlib ipython
+> 1. pip install pygame
+> 2. pip install torch torchvision
+> 3. pip install matplotlib ipython
 ## Working of the Application:
 1. Rule of the Game: Snake should not hit the boundaries and itself.
 2. Process:
